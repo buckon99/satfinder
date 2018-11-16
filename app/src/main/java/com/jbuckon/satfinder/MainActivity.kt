@@ -18,6 +18,8 @@ import android.content.Intent
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.jbuckon.satfinder.ar.SatFinderAndroidActivity
+import kotlinx.android.synthetic.main.settings_fragment.*
+import java.util.*
 
 
 /*
@@ -35,13 +37,16 @@ import com.jbuckon.satfinder.ar.SatFinderAndroidActivity
 
 
  */
-class MainActivity : AppCompatActivity(), SatelliteFragment.OnListFragmentInteractionListener{
+class MainActivity : AppCompatActivity(), SatelliteFragment.OnListFragmentInteractionListener, EnableSatelliteFragment.OnListFragmentInteractionListener{
+
+    companion object {
+        lateinit var clickListener: EventListener
+    }
 
     override fun onListFragmentInteraction(item: DataStore.Satellite?) {
         var l = item
         intent = Intent(this, SatFinderAndroidActivity::class.java)
         startActivity(intent)
-        finish()
     }
 
     private var satViewModel: DataStore.SatelliteViewModel = DataStore.SatelliteViewModel(null)
@@ -137,7 +142,9 @@ class MainActivity : AppCompatActivity(), SatelliteFragment.OnListFragmentIntera
         })
 
         //TODO: wait for both event listeners, then calculate pass schedule
-        pagerAdapter = PagerAdapter(supportFragmentManager, arrayListOf(mapFragment, SatelliteFragment(), SettingsFragment()))
+        val settings = SettingsFragment()
+
+        pagerAdapter = PagerAdapter(supportFragmentManager, arrayListOf(mapFragment, SatelliteFragment(), settings, EnableSatelliteFragment()))
         viewPager.adapter = pagerAdapter
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
 
