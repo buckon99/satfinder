@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "604046383990",
+    "firebase_url": "https://satfinder-876b2.firebaseio.com",
+    "project_id": "satfinder-876b2",
+    "storage_bucket": "satfinder-876b2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604046383990:android:3b8f4391323bb589",
+        "android_client_info": {
+          "package_name": "com.jbuckon.satfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604046383990-u5f1ddbsv9e8jdd1mapv9lmta57iqp2f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jbuckon.satfinder",
+            "certificate_hash": "e811393dd26b72c3a6eb903bf30262314cd1abec"
+          }
+        },
+        {
+          "client_id": "604046383990-amf0ilb3vfnskn774dogkvb7de9t9bes.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAF-E0NWGQW34y_95TDOJMsvwZK1pXjI9I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604046383990-amf0ilb3vfnskn774dogkvb7de9t9bes.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

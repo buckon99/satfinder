@@ -8,10 +8,37 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-    <fragment class="com.google.android.gms.maps.MapFragment"
-              android:id="@+id/map"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"/>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+    />
+
+    <!--app:layout_constraintBottom_toTopOf="@+id/infoBar" >
+
+<LinearLayout
+    android:id="@+id/infoBar"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    app:layout_constraintBottom_toTopOf="@+id/navigation"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10px"
+        android:layout_weight="1"
+        android:text="Tracking 3 satellites from 2 sources" />
+
+    <Button
+        android:id="@+id/button2"
+        style="@android:style/Widget.DeviceDefault.Button.Borderless"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="Set Time"
+        android:textColor="@color/colorAccent" />
+</LinearLayout>-->
     <android.support.design.widget.BottomNavigationView
             android:id="@+id/navigation"
             android:layout_width="0dp"
@@ -22,6 +49,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:menu="@menu/navigation"/>
+            app:menu="@menu/navigation">
+
+    </android.support.design.widget.BottomNavigationView>
 
 </android.support.constraint.ConstraintLayout>
