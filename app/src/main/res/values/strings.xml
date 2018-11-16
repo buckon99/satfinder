@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SatFinder</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">AIzaSyCSj_vclSKLHAkM_jbva4s7mAUD2pyaWJA</string>
+    <string name="title_notifications">Settings</string>
+</resources>
