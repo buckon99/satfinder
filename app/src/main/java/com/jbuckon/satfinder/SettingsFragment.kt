@@ -21,9 +21,9 @@ class SettingsFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         var f = inflater.inflate(R.layout.settings_fragment, container, false)
 
-        satButton.setOnClickListener{
+        /*satButton.setOnClickListener{
 
-        }
+        }*/
         return f
     }
 

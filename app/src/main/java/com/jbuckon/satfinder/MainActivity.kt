@@ -38,10 +38,10 @@ import com.jbuckon.satfinder.ar.SatFinderAndroidActivity
 class MainActivity : AppCompatActivity(), SatelliteFragment.OnListFragmentInteractionListener{
 
     override fun onListFragmentInteraction(item: DataStore.Satellite?) {
-        /*var l = item
+        var l = item
         intent = Intent(this, SatFinderAndroidActivity::class.java)
         startActivity(intent)
-        finish()*/
+        finish()
     }
 
     private var satViewModel: DataStore.SatelliteViewModel = DataStore.SatelliteViewModel(null)
