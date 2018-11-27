@@ -13,20 +13,19 @@
         android:textAppearance="?attr/textAppearanceListItem" />
 
     <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/item_number"
+            android:layout_margin="@dimen/text_margin"
+            android:text="next pass:"
+            android:textAppearance="?attr/textAppearanceListItem" />
+    <TextView
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/item_number"
+        android:layout_toRightOf="@id/label"
         android:layout_margin="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:text="Track"
-        android:textColor="@color/colorAccent"
-        android:theme="@style/Base.Widget.AppCompat.Button.Borderless" />
 
 </RelativeLayout>

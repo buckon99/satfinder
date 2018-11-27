@@ -98,6 +98,14 @@ final public class SatImageOverlay extends android.support.v7.widget.AppCompatIm
         invalidate();
     }
 
+    public static double azm = 180;
+    public static double elev = 5;
+    public static String name = "Satellite";
+    public void setSat(Double azm, Double elev, String name) {
+        this.azm = azm;
+        this.elev = elev;
+        this.name = name;
+    }
     // arguments radians
 
     private float convertAzimuth(double a, double magDec) {
@@ -123,8 +131,10 @@ final public class SatImageOverlay extends android.support.v7.widget.AppCompatIm
         int i = 0;
         int c = (activity.lightColorScheme) ? lightSatColors[i % satColors.length] : satColors[i % satColors.length];
 
-        drawSat(canvas, paint, 180 * dToR, 60 * dToR,
-                "test", c);
+        if(name != null)
+        //drawSat(canvas, paint, azm * dToR, elev * dToR, "test", c);
+            drawSat(canvas, paint, azm * dToR, -20 * dToR,
+                name, c);
         if (false) {
             // extra data for calibration
             paint.setColor(Color.rgb(64, 0, 0));
@@ -144,7 +154,7 @@ final public class SatImageOverlay extends android.support.v7.widget.AppCompatIm
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(col);
         float alt = scaler((float) -el, yAngle, yDim);
-        float xp = convertAzimuth(az, activity.magDec);
+        float xp = convertAzimuth(azm, activity.magDec);
         canvas.drawCircle(xp, alt, radius, paint);
         float len = paint.measureText(name) / 2;
         canvas.drawText(name, xp - len, alt - (radius + paint.descent()), paint);

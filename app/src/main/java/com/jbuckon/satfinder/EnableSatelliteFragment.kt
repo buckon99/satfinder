@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.jbuckon.satfinder.models.Satellite
 
 /**
  * A fragment representing a list of Items.
@@ -41,7 +42,7 @@ class EnableSatelliteFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyEnableSatelliteRecyclerViewAdapter(DataStore.satVideModel.satellites, listener)
+                adapter = MyEnableSatelliteRecyclerViewAdapter(SatDataStore.satViewModel.satellites, listener)
             }
         }
         return view
@@ -74,7 +75,7 @@ class EnableSatelliteFragment : Fragment() {
      */
     interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        fun onListFragmentInteraction(item: DataStore.Satellite?)
+        fun onListFragmentInteraction(item: Satellite?)
     }
 
     companion object {

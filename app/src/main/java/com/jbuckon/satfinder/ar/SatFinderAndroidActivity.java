@@ -64,7 +64,6 @@ public class SatFinderAndroidActivity extends AppCompatActivity implements
     SatImageOverlay skyViewOverlay;
 
     BiQuadraticFilter sinBF, cosBF;
-    RadioButton satsUS, satsInt;
     String strSource;
     int posUpdateTimeInterval = 5000; // milliseconds
     int posUpdateDistanceInterval = 50; // meters
@@ -72,7 +71,6 @@ public class SatFinderAndroidActivity extends AppCompatActivity implements
     WebView webList = null;
     double magDec = 0;
     double useMagDec = 0;
-    private Handler handler;
 
     private SensorManager mSensorManager;
     float sensorAzimuth = 0;
@@ -121,7 +119,6 @@ public class SatFinderAndroidActivity extends AppCompatActivity implements
 
         satData = new ArrayList<>();
 
-        handler = new Handler();
 
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -237,6 +234,11 @@ public class SatFinderAndroidActivity extends AppCompatActivity implements
     private void setupLinks() {
         skyViewTab = findViewById(R.id.skyview_tab);
         skyViewOverlay = findViewById(R.id.sat_overlay);
+
+        double azimuth = getIntent().getDoubleExtra("azimuth", 0);
+        double elevation = getIntent().getDoubleExtra("elevation", 0);
+        String name = getIntent().getStringExtra("name");
+        skyViewOverlay.setSat(azimuth, elevation, name);
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -280,6 +282,7 @@ public class SatFinderAndroidActivity extends AppCompatActivity implements
                         public void onLocationChanged(Location location) {
                             gotLocation(location);
                         }
+
 
                         public void onStatusChanged(String provider, int status,
                                                     Bundle extras) {

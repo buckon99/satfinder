@@ -104,11 +104,18 @@ public class SatPos {
 		return azimuth;
 	}
 
+	public double getCalcAzimuth() {
+		return azimuth / (Math.PI * 2.0) * 360;
+	}
 	/**
 	 * @return the elevation
 	 */
 	public double getElevation() {
 		return elevation;
+	}
+
+	public double getCalcElevation() {
+		return elevation / (Math.PI * 2.0) * 360;
 	}
 
 	/**
@@ -166,7 +173,9 @@ public class SatPos {
 	/**
 	 * @return the latitude
 	 */
-	public final double getLatitude() { return latitude / (Math.PI * 2.0) * 360; }
+	public final double getLatitude() { return latitude; }
+
+	public final double getCalcLatitude() { return  latitude / (Math.PI * 2.0) * 360; }
 
 	/**
 	 * @param latitude
@@ -179,8 +188,9 @@ public class SatPos {
 	/**
 	 * @return the longitude
 	 */
-	public final double getLongitude()	{ return longitude / (Math.PI * 2.0) * 360; }
+	public final double getLongitude()	{ return longitude; }
 
+	public final double getCalcLongitude() { return longitude / (Math.PI * 2.0) * 360; }
 	/**
 	 * @param longitude
 	 *            the longitude to set

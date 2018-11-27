@@ -9,6 +9,7 @@ import android.widget.TextView
 
 
 import com.jbuckon.satfinder.EnableSatelliteFragment.OnListFragmentInteractionListener
+import com.jbuckon.satfinder.models.Satellite
 
 import kotlinx.android.synthetic.main.fragment_enablesatellite.view.*
 
@@ -18,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_enablesatellite.view.*
  * TODO: Replace the implementation with code for your data type.
  */
 class MyEnableSatelliteRecyclerViewAdapter(
-        private val mValues: List<DataStore.Satellite>,
+        private val mValues: List<Satellite>,
         private val mListener: OnListFragmentInteractionListener?)
     : RecyclerView.Adapter<MyEnableSatelliteRecyclerViewAdapter.ViewHolder>() {
 
@@ -26,7 +27,7 @@ class MyEnableSatelliteRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as DataStore.Satellite
+            val item = v.tag as Satellite
             // Notify the active callbacks interface (the activity, if the fragment is attached to
             // one) that an item has been selected.
             mListener?.onListFragmentInteraction(item)
@@ -42,6 +43,11 @@ class MyEnableSatelliteRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
         holder.mToggle.isChecked = item.is_enabled
+        holder.mToggle.setOnClickListener{
+            item.is_enabled = !item.is_enabled
+            SatDataStore.toggleSat(item)
+        }
+
         holder.mContentView.text = item.name
 
         with(holder.mView) {

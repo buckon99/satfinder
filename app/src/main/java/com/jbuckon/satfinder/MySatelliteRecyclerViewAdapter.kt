@@ -8,16 +8,17 @@ import android.widget.TextView
 
 
 import com.jbuckon.satfinder.SatelliteFragment.OnListFragmentInteractionListener
+import com.jbuckon.satfinder.models.Satellite
 
 import kotlinx.android.synthetic.main.fragment_satellite.view.*
 
 /**
- * [RecyclerView.Adapter] that can display a [DataStore.Satellite] and makes a call to the
+ * [RecyclerView.Adapter] that can display a [SatDataStore.Satellite] and makes a call to the
  * specified [OnListFragmentInteractionListener].
  * TODO: Replace the implementation with code for your data type.
  */
 class MySatelliteRecyclerViewAdapter(
-        private val mValues: List<DataStore.Satellite>,
+        private val mValues: List<Satellite>,
         private val mListener: OnListFragmentInteractionListener?)
     : RecyclerView.Adapter<MySatelliteRecyclerViewAdapter.ViewHolder>() {
 
@@ -25,7 +26,7 @@ class MySatelliteRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as DataStore.Satellite
+            val item = v.tag as Satellite
             // Notify the active callbacks interface (the activity, if the fragment is attached to
             // one) that an item has been selected.
             mListener?.onListFragmentInteraction(item)
