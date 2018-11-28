@@ -9,15 +9,17 @@
         android:id="@+id/item_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Sample Name"
         android:textAppearance="?attr/textAppearanceListItem" />
 
     <TextView
             android:id="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/item_number"
-            android:layout_margin="@dimen/text_margin"
+            android:layout_below="@id/item_number"
+            android:layout_alignLeft="@id/item_number"
             android:text="next pass:"
             android:textAppearance="?attr/textAppearanceListItem" />
     <TextView

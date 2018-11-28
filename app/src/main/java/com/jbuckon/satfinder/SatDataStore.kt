@@ -1,5 +1,9 @@
 package com.jbuckon.satfinder;
 
+import android.app.Activity
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Handler
 import android.preference.PreferenceManager
@@ -11,6 +15,7 @@ import com.jbuckon.satfinder.models.SatSource
 import com.jbuckon.satfinder.models.SatelliteViewModel
 import com.jbuckon.satfinder.models.Satellite
 import com.jbuckon.satfinder.models.SatelliteSourceViewModel
+import kotlinx.android.synthetic.main.fragment_satellite_list.*
 
 object SatDataStore {
 
@@ -21,7 +26,7 @@ object SatDataStore {
     private var satSrcRef: DatabaseReference? = null
     private var satRef: DatabaseReference? = null
 
-    fun initFirebase(context: Context, recyler: RecyclerView?) {
+    fun initFirebase(context: Context, lifeCycleOwner: LifecycleOwner, recycler: RecyclerView?) {
         val database = FirebaseDatabase.getInstance()
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -29,7 +34,10 @@ object SatDataStore {
             database.setPersistenceEnabled(true)
             prefs.edit().putBoolean("firstRun", false).apply()
         }
-
+        satViewModel.liveSats.observe(lifeCycleOwner, Observer<List<Satellite>>{ sat ->
+            print(sat)
+            recycler?.adapter?.notifyDataSetChanged()
+        })
 
         satSrcRef = database.getReference("satData")
         satRef = database.getReference("statusData")
@@ -38,11 +46,7 @@ object SatDataStore {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.run {
                     val satellites = children.mapNotNull { it.getValue(Satellite::class.java) }
-
-                    for (sat in satellites) {
-                        satViewModel.add(sat)
-                    }
-                    recyler?.adapter?.notifyDataSetChanged()
+                    satViewModel.update(satellites)
                 }
             }
             override fun onCancelled(p0: DatabaseError) {
@@ -53,9 +57,18 @@ object SatDataStore {
         satSrcRef?.addValueEventListener(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.run {
-                    var sources = children.mapNotNull { it.getValue(SatSource::class.java) }
-                    for (source in sources)
-                        queue.add(source)
+                    /*var sources = children.mapNotNull { it.getValue(SatSource::class.java) }
+                    for (source in sources){
+                        satSourceViewModel.add(source)
+                        Thread {
+                            for (source in satSourceViewModel.sources) {
+                                satSourceViewModel.add(source)
+                                satViewModel.CreateSatellites(source, satRef)
+                            }
+                            locked = false
+                        }.start()
+                    }*/
+
 
                 }
             }
@@ -63,30 +76,8 @@ object SatDataStore {
                 print("error")
             }
         })
-        scheduleUpdates()
     }
     private var locked = false
-    private var queue = ArrayList<SatSource>()
-    private fun scheduleUpdates() {
-        if(!locked) {
-            locked = true
-            Thread {
-                if (queue.count() > 0) {
-                    var source = queue.get(0)
-                    queue.remove(source)
-                    satSourceViewModel.add(source)
-                    satViewModel.CreateSatellites(source, satRef)
-                } else {
-                    for (source in satSourceViewModel.sources) {
-                        satSourceViewModel.add(source)
-                        satViewModel.CreateSatellites(source, satRef)
-                    }
-                    locked = false
-                }
-            }.start()
-        }
-
-    }
 
     fun toggleSat(sat: Satellite) {
         satRef?.child(sat.name)?.setValue(sat)

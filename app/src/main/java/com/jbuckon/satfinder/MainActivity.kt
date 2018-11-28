@@ -1,6 +1,8 @@
 package com.jbuckon.satfinder
 
 import android.app.DatePickerDialog
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -18,8 +20,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.jbuckon.satfinder.ar.SatFinderAndroidActivity
 import com.jbuckon.satfinder.models.SatSource
 import com.jbuckon.satfinder.models.Satellite
+import com.jbuckon.satfinder.models.SatelliteViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
-import java.util.*
 
 /*
     MILESTONE 3 PROJECT NOTES
@@ -99,7 +101,7 @@ class MainActivity : AppCompatActivity(), SatelliteFragment.OnListFragmentIntera
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        SatDataStore.initFirebase(this, list)
+        SatDataStore.initFirebase(this, this, list)
 
         var t: Runnable? = null
         t = Runnable {

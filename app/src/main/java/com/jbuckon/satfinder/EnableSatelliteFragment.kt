@@ -42,7 +42,9 @@ class EnableSatelliteFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyEnableSatelliteRecyclerViewAdapter(SatDataStore.satViewModel.satellites, listener)
+                if(SatDataStore.satViewModel.liveSats.value == null)
+                    SatDataStore.satViewModel.liveSats.value = ArrayList()
+                adapter = MyEnableSatelliteRecyclerViewAdapter(SatDataStore.satViewModel.liveSats.value!!, listener)
             }
         }
         return view
