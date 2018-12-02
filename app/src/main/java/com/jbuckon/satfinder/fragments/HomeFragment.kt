@@ -1,15 +1,13 @@
-package com.jbuckon.satfinder
+package com.jbuckon.satfinder.fragments
 
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.app.SupportActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.gms.maps.SupportMapFragment
-import kotlinx.android.synthetic.main.fragment_home.*
+import com.jbuckon.satfinder.R
 
 
 // TODO: Rename parameter arguments, choose names that match

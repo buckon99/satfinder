@@ -1,32 +1,40 @@
-package com.jbuckon.satfinder;
+package com.jbuckon.satfinder
 
-import android.app.Activity
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.os.Handler
 import android.preference.PreferenceManager
-import android.support.v7.widget.RecyclerView
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.*
-import com.jbuckon.satfinder.SatDataStore.satSourceViewModel
-import com.jbuckon.satfinder.SatDataStore.satViewModel
-import com.jbuckon.satfinder.models.SatSource
+import com.jbuckon.satfinder.Factory.SatelliteDataFactory
 import com.jbuckon.satfinder.models.SatelliteViewModel
 import com.jbuckon.satfinder.models.Satellite
 import com.jbuckon.satfinder.models.SatelliteSourceViewModel
-import kotlinx.android.synthetic.main.fragment_satellite_list.*
 
-object SatDataStore {
+class SatDataStore {
 
-    var counter = 0
-    var satViewModel = SatelliteViewModel()
-    var satSourceViewModel = SatelliteSourceViewModel()
+    lateinit var satViewModel: SatelliteViewModel
+    lateinit var satSourceViewModel: SatelliteSourceViewModel
 
     private var satSrcRef: DatabaseReference? = null
     private var satRef: DatabaseReference? = null
 
-    fun initFirebase(context: Context, lifeCycleOwner: LifecycleOwner, recycler: RecyclerView?) {
+
+    private var loop: Boolean = true
+
+    fun ClearMarkers() {
+        for(sat in satViewModel.enabledSatellites.toTypedArray()) {
+            sat.marker = null
+        }
+    }
+
+
+    fun initFirebase(context: Context, lifeCycleOwner: LifecycleOwner, mapFragment: SupportMapFragment, callback: Runnable) {
+        satViewModel = SatelliteViewModel()
+        satSourceViewModel = SatelliteSourceViewModel()
         val database = FirebaseDatabase.getInstance()
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -34,19 +42,47 @@ object SatDataStore {
             database.setPersistenceEnabled(true)
             prefs.edit().putBoolean("firstRun", false).apply()
         }
-        satViewModel.liveSats.observe(lifeCycleOwner, Observer<List<Satellite>>{ sat ->
-            print(sat)
-            recycler?.adapter?.notifyDataSetChanged()
+        satViewModel.liveSats.observe(lifeCycleOwner, Observer<Array<Satellite>>{ sats ->
+            print(sats)
+            mapFragment.getMapAsync{
+                for(sat in sats!!){
+                    if(sat.is_enabled && sat.sat_position != null) {
+                        var pos = LatLng(sat.sat_position!!.lat, sat.sat_position!!.lon)
+                        if(sat.marker != null) {
+                            sat.marker?.position = pos
+                        } else {
+                            //create new marker for satellite
+                            sat.marker = it.addMarker(MarkerOptions().position(pos).title(sat.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.sat)))
+                        }
+                    }
+                }
+                val count: Int = sats?.count()!!
+                val sources : Int = satSourceViewModel.sources.count()
+                if(/*sources > 0 && */count > 0)
+                {
+                    //count?.text = "tracking " + sats + " satellites from " + sources + " sources"
+                    callback.run()
+                }
+            }
         })
 
-        satSrcRef = database.getReference("satData")
-        satRef = database.getReference("statusData")
+
+        satSrcRef = database.getReference("satSources")
+        satRef = database.getReference("satellites")
+
+        /* Initialization source
+            satSrcRef?.child("0")?.setValue(SatSource(
+            "0",
+            "CalPoly CubeSat Lab",
+            "http://mstl.atl.calpoly.edu/~ops/keps/kepler.txt"
+
+        ))*/
 
         satRef?.addValueEventListener(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.run {
                     val satellites = children.mapNotNull { it.getValue(Satellite::class.java) }
-                    satViewModel.update(satellites)
+                    satViewModel.update(satellites, firebase = true)
                 }
             }
             override fun onCancelled(p0: DatabaseError) {
@@ -60,16 +96,17 @@ object SatDataStore {
                     /*var sources = children.mapNotNull { it.getValue(SatSource::class.java) }
                     for (source in sources){
                         satSourceViewModel.add(source)
-                        Thread {
+                        Thread{
                             for (source in satSourceViewModel.sources) {
                                 satSourceViewModel.add(source)
-                                satViewModel.CreateSatellites(source, satRef)
+                                var arr = SatelliteDataFactory().GetSatellites(source)
+                                for(sat in arr) {
+                                    satViewModel.add(sat)
+                                    satRef?.child(sat.name)?.setValue(sat)
+                                }
                             }
-                            locked = false
                         }.start()
                     }*/
-
-
                 }
             }
             override fun onCancelled(p0: DatabaseError) {
@@ -77,9 +114,37 @@ object SatDataStore {
             }
         })
     }
-    private var locked = false
+
+    fun Clear() {
+        satViewModel.clear()
+        loop = false
+
+    }
+    fun UpdateLoop() {
+        loop = true
+        Thread{
+            do{
+
+                val array = arrayOfNulls<Satellite>( satViewModel.enabledSatellites.size)
+                satViewModel.enabledSatellites.toArray(array)
+                for(sat in array) {
+
+                    if(sat != null) {
+                        sat.sat_position = SatelliteDataFactory().CalcTle(sat.TLE)
+                        satViewModel.set(sat)
+                    }
+                }
+                Thread.sleep(500)//make sure to not update to fast as to not drain battery
+            }while(loop)
+        }.start()
+    }
+
 
     fun toggleSat(sat: Satellite) {
+        if(!sat.is_enabled) {
+            satViewModel.set(sat)
+        }
+
         satRef?.child(sat.name)?.setValue(sat)
     }
 

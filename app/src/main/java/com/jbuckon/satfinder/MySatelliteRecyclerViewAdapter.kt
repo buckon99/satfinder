@@ -5,9 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.jbuckon.satfinder.fragments.SatelliteFragment
+import com.jbuckon.satfinder.fragments.TrackSatelliteFragment
 
 
-import com.jbuckon.satfinder.SatelliteFragment.OnListFragmentInteractionListener
 import com.jbuckon.satfinder.models.Satellite
 
 import kotlinx.android.synthetic.main.fragment_satellite.view.*
@@ -19,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_satellite.view.*
  */
 class MySatelliteRecyclerViewAdapter(
         private val mValues: List<Satellite>,
-        private val mListener: OnListFragmentInteractionListener?)
+        private val mListener: TrackSatelliteFragment.OnTrackListFragmentInteractionListener?)
     : RecyclerView.Adapter<MySatelliteRecyclerViewAdapter.ViewHolder>() {
 
     private val mOnClickListener: View.OnClickListener
@@ -29,7 +30,7 @@ class MySatelliteRecyclerViewAdapter(
             val item = v.tag as Satellite
             // Notify the active callbacks interface (the activity, if the fragment is attached to
             // one) that an item has been selected.
-            mListener?.onListFragmentInteraction(item)
+            mListener?.onTrackListFragmentInteraction(item)
         }
     }
 
@@ -42,7 +43,7 @@ class MySatelliteRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
         holder.mIdView.text = item.name
-        holder.mContentView.text = item.next_pass
+        holder.mContentView.text = item.sat_position?.next_pass
 
         with(holder.mView) {
             tag = item

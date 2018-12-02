@@ -1,4 +1,4 @@
-package com.jbuckon.satfinder
+package com.jbuckon.satfinder.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -9,8 +9,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.jbuckon.satfinder.MyEnableSatelliteRecyclerViewAdapter
+import com.jbuckon.satfinder.R
+import com.jbuckon.satfinder.SatDataStore
 import com.jbuckon.satfinder.models.Satellite
-
 
 /**
  * A fragment representing a list of Items.
@@ -19,9 +21,27 @@ import com.jbuckon.satfinder.models.Satellite
  */
 class SatelliteFragment : Fragment() {
 
+    companion object {
+
+        // TODO: Customize parameter argument names
+        const val ARG_COLUMN_COUNT = "column-count"
+
+        // TODO: Customize parameter initialization
+        @JvmStatic
+        fun newInstance(dataStore: SatDataStore): SatelliteFragment {
+            val enabled = SatelliteFragment()
+            enabled.dataStore = dataStore
+            enabled.apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_COLUMN_COUNT, columnCount)
+                }
+            }
+            return enabled
+        }
+    }
     // TODO: Customize parameters
     private var columnCount = 1
-
+    private lateinit var dataStore: SatDataStore
     private var listener: OnListFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +54,7 @@ class SatelliteFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_satellite_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_enablesatellite_list, container, false)
 
         // Set the adapter
         if (view is RecyclerView) {
@@ -43,7 +63,7 @@ class SatelliteFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MySatelliteRecyclerViewAdapter(SatDataStore.satViewModel.enabledSatellites, listener)
+                adapter = MyEnableSatelliteRecyclerViewAdapter(dataStore.satViewModel.satellites, listener, dataStore)
             }
         }
         return view
@@ -77,20 +97,5 @@ class SatelliteFragment : Fragment() {
     interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onListFragmentInteraction(item: Satellite?)
-    }
-
-    companion object {
-
-        // TODO: Customize parameter argument names
-        const val ARG_COLUMN_COUNT = "column-count"
-
-        // TODO: Customize parameter initialization
-        @JvmStatic
-        fun newInstance(columnCount: Int) =
-                SatelliteFragment().apply {
-                    arguments = Bundle().apply {
-                        putInt(ARG_COLUMN_COUNT, columnCount)
-                    }
-                }
     }
 }

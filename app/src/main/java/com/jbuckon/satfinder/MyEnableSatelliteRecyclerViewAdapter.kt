@@ -8,7 +8,7 @@ import android.widget.Switch
 import android.widget.TextView
 
 
-import com.jbuckon.satfinder.EnableSatelliteFragment.OnListFragmentInteractionListener
+import com.jbuckon.satfinder.fragments.SatelliteFragment.OnListFragmentInteractionListener
 import com.jbuckon.satfinder.models.Satellite
 
 import kotlinx.android.synthetic.main.fragment_enablesatellite.view.*
@@ -20,7 +20,8 @@ import kotlinx.android.synthetic.main.fragment_enablesatellite.view.*
  */
 class MyEnableSatelliteRecyclerViewAdapter(
         private val mValues: List<Satellite>,
-        private val mListener: OnListFragmentInteractionListener?)
+        private val mListener: OnListFragmentInteractionListener?,
+        private val dataStore: SatDataStore)
     : RecyclerView.Adapter<MyEnableSatelliteRecyclerViewAdapter.ViewHolder>() {
 
     private val mOnClickListener: View.OnClickListener
@@ -45,7 +46,7 @@ class MyEnableSatelliteRecyclerViewAdapter(
         holder.mToggle.isChecked = item.is_enabled
         holder.mToggle.setOnClickListener{
             item.is_enabled = !item.is_enabled
-            SatDataStore.toggleSat(item)
+            dataStore.toggleSat(item)
         }
 
         holder.mContentView.text = item.name

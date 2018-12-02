@@ -1,8 +1,5 @@
 package com.jbuckon.satfinder
 
-import android.app.DatePickerDialog
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -10,18 +7,16 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import kotlinx.android.synthetic.main.fragment_satellite_list.*
 import android.content.Intent
-import android.os.Handler
 import android.view.View
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.jbuckon.satfinder.ar.SatFinderAndroidActivity
-import com.jbuckon.satfinder.models.SatSource
+import com.jbuckon.satfinder.fragments.SatelliteFragment
+import com.jbuckon.satfinder.fragments.HomeFragment
+import com.jbuckon.satfinder.fragments.TrackSatelliteFragment
+import com.jbuckon.satfinder.fragments.OptionsFragment
 import com.jbuckon.satfinder.models.Satellite
-import com.jbuckon.satfinder.models.SatelliteViewModel
-import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.fragment_enablesatellite_list.*
 
 /*
     MILESTONE 3 PROJECT NOTES
@@ -29,7 +24,7 @@ import kotlinx.android.synthetic.main.fragment_home.*
 
     Resources:
 
-    ar app that the code from the package com.jbuckon.satfinder.ar is based off of: https://arachnoid.com/android/SatFinderAndroid/index.html
+    ar app that the code from the package com.jbuckon.satfinder.ar is based off of:
     prediction library that com.jbuckon.satfinder.predict is a modified version of: https://github.com/g4dpz/predict4java
 
     Milestone 3 Notes:
@@ -56,26 +51,28 @@ import kotlinx.android.synthetic.main.fragment_home.*
     for changes to the options page to take effect, the app has to be restarted.
 
  */
-class MainActivity : AppCompatActivity(), SatelliteFragment.OnListFragmentInteractionListener, EnableSatelliteFragment.OnListFragmentInteractionListener, HomeFragment.OnFragmentInteractionListener{
+class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFragmentInteractionListener, SatelliteFragment.OnListFragmentInteractionListener, HomeFragment.OnFragmentInteractionListener{
     override fun onFragmentInteraction(uri: Uri) {
         TODO("not implemented")
     }
 
-    override fun onListFragmentInteraction(item: Satellite?) {
-        var l = item
+    override fun onTrackListFragmentInteraction(item: Satellite?) {
         intent = Intent(this, SatFinderAndroidActivity::class.java)
-        if(l?.azimuth != null && l.elevation != null){
-            intent.putExtra("azimuth", l.azimuth!!)
-            intent.putExtra("elevation", l.elevation!!)
-            intent.putExtra("name", l.name)
+        if(item?.sat_position != null) {
+            intent.putExtra("azimuth", item.sat_position!!.azimuth)
+            intent.putExtra("elevation", item.sat_position!!.elevation!!)
+            intent.putExtra("name", item.name)
         }
 
         startActivity(intent)
     }
+    override fun onListFragmentInteraction(item: Satellite?) {
 
+    }
+
+    lateinit var satDataStore: SatDataStore
     private lateinit var pagerAdapter: PagerAdapter
     private var locationManager : LocationManager? = null
-    private var homeFragment: SupportMapFragment = SupportMapFragment()
     //private var homeFragment: HomeFragment = HomeFragment()
 
 
@@ -97,41 +94,34 @@ class MainActivity : AppCompatActivity(), SatelliteFragment.OnListFragmentIntera
         false
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        //satDataStore.Clear()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        SatDataStore.initFirebase(this, this, list)
+        satDataStore = SatDataStore()
+        var homeFragment = SupportMapFragment()
+        homeFragment.retainInstance = true //this makes sure markers aren't wiped onRotate or leaving the page and coming back
 
-        var t: Runnable? = null
-        t = Runnable {
-            homeFragment.getMapAsync{
-                for(sat in SatDataStore.satViewModel.enabledSatellites){
-                    if(sat.is_enabled && sat.lat != null && sat.lon != null) {
-                        var marker = MarkerOptions().position(LatLng(sat.lat!!, sat.lon!!)).title(sat.name)
-                        it.addMarker(marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.sat)))
-                    }
-                }
-                val sats: Int = SatDataStore.satViewModel.enabledSatellites.count()
-                val sources : Int = SatDataStore.satSourceViewModel.sources.count()
-                if(sources > 0 && sats > 0)
-                {
-                    count?.text = "tracking " + sats + " satellites from " + sources + " sources"
-                    list?.adapter?.notifyDataSetChanged()
-                }
-            }
-            Handler().postDelayed(t, 3000)
+
+        val satTrackFrag = TrackSatelliteFragment.newInstance(satDataStore)
+        val satelliteFrag = SatelliteFragment.newInstance(satDataStore)
+        val run = Runnable {
+            satTrackFrag.trackList.adapter?.notifyDataSetChanged()
+            satelliteFrag.satList.adapter?.notifyDataSetChanged()
         }
-        Handler().postDelayed(t, 3000)
-
-
+        satDataStore.initFirebase(this, this, homeFragment, run)
+        satDataStore.UpdateLoop()
 
         //TODO: wait for both event listeners, then calculate pass schedule
-        val settings = SettingsFragment()
-        settings.setOnClickListener(View.OnClickListener{
+        val settings = OptionsFragment()
+        /*settings.setOnClickListener(View.OnClickListener{
             viewPager.setCurrentItem(3, false)
-        })
-        pagerAdapter = PagerAdapter(supportFragmentManager, arrayListOf(homeFragment, SatelliteFragment(), settings, EnableSatelliteFragment()))
+        })*/
+        pagerAdapter = PagerAdapter(supportFragmentManager, arrayListOf(homeFragment, satTrackFrag, settings, satelliteFrag))
 
         /*var listener =  object : ViewPager.OnPageChangeListener {
 
@@ -192,6 +182,7 @@ class MainActivity : AppCompatActivity(), SatelliteFragment.OnListFragmentIntera
         }
         viewPager?.addOnPageChangeListener(listener)
         viewPager.post{ listener.onPageSelected(viewPager.currentItem) }*/
+        viewPager.offscreenPageLimit = 4
         viewPager.adapter = pagerAdapter
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
 

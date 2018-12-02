@@ -1,7 +1,6 @@
 package com.jbuckon.satfinder.models
 
 import android.arch.lifecycle.ViewModel
-import com.jbuckon.satfinder.SatDataStore
 import java.util.ArrayList
 import java.util.HashMap
 
@@ -28,9 +27,6 @@ class SatelliteSourceViewModel : ViewModel() {
     }
     fun add(sat: SatSource) {
         sourceMap[sat.name] = sat
-        var id = sat.id.toInt()
-        if(id > SatDataStore.counter)
-            SatDataStore.counter = id
         sources.add(sat)
     }
 }

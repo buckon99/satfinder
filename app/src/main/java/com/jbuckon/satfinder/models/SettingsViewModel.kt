@@ -1,4 +1,4 @@
-package com.jbuckon.satfinder
+package com.jbuckon.satfinder.models
 
 import android.arch.lifecycle.ViewModel;
 
