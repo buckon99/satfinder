@@ -1,4 +1,4 @@
-<androidx.preference.PreferenceScreen
+<PreferenceScreen
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <SwitchPreferenceCompat
@@ -10,4 +10,4 @@
             app:title="Send feedback"
             app:summary="Report technical issues or suggest new features"/>
 
-</androidx.preference.PreferenceScreen>
+</PreferenceScreen>
