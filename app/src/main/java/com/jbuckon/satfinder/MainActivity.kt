@@ -109,6 +109,8 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
 
         val satTrackFrag = TrackSatelliteFragment.newInstance(satDataStore)
         val satelliteFrag = SatelliteFragment.newInstance(satDataStore)
+        val settings = OptionsFragment.newInstance(satDataStore)
+
         val run = Runnable {
             satTrackFrag.trackList.adapter?.notifyDataSetChanged()
             satelliteFrag.satList.adapter?.notifyDataSetChanged()
@@ -117,7 +119,6 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
         satDataStore.UpdateLoop()
 
         //TODO: wait for both event listeners, then calculate pass schedule
-        val settings = OptionsFragment()
         /*settings.setOnClickListener(View.OnClickListener{
             viewPager.setCurrentItem(3, false)
         })*/

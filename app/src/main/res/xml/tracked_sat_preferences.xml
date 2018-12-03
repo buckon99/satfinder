@@ -1,0 +1,13 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:title="Tracked Satellites" >
+
+    <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="nested_screen_1_1"
+            android:title="Nested screen 1.1 check box" />
+
+    <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="nested_screen_1_2"
+            android:title="Nested screen 1.2 check box" />
+</PreferenceScreen>
