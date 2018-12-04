@@ -12,12 +12,19 @@ import com.jbuckon.satfinder.R
 import com.jbuckon.satfinder.SatDataStore
 import kotlinx.android.synthetic.main.settings_fragment.view.*
 import android.app.Activity
-import android.support.v7.preference.PreferenceScreen
+
+
 
 
 class OptionsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback  {
 
-    override fun onPreferenceStartScreen(preferenceFragmentCompat: PreferenceFragmentCompat?, p1: PreferenceScreen?): Boolean {
+    var openFragmentListener: OpenFragmentListener? = null
+
+    interface OpenFragmentListener {
+        fun openFragment()
+    }
+
+    override fun onPreferenceStartScreen(preferenceFragmentCompat: PreferenceFragmentCompat?, p1: android.support.v7.preference.PreferenceScreen?): Boolean {
         preferenceFragmentCompat?.preferenceScreen = preferenceScreen
         return true
     }
@@ -25,8 +32,9 @@ class OptionsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnP
     companion object {
 
         @JvmStatic
-        fun newInstance(dataStore: SatDataStore): OptionsFragment {
+        fun newInstance(dataStore: SatDataStore, listen: OpenFragmentListener): OptionsFragment {
             val enabled = OptionsFragment()
+            enabled.openFragmentListener = listen
             enabled.dataStore = dataStore
 
             return enabled
@@ -44,6 +52,11 @@ class OptionsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnP
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
+        val preference = this.findPreference("satellites")
+        preference.setOnPreferenceClickListener{
+            openFragmentListener?.openFragment()
+            true
+        }
 
         /*val satellites = findPreference("satellites")
         satellites.setOnPreferenceClickListener {

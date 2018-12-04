@@ -42,6 +42,15 @@
                 android:enabled="true"
                 android:exported="true">
         </service>
+
+        <activity
+                android:name=".SettingsActivity"
+                android:label="@string/title_activity_settings"
+                android:parentActivityName=".MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.jbuckon.satfinder.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

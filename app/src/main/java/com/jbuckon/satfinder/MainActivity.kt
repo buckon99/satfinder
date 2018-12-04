@@ -1,5 +1,6 @@
 package com.jbuckon.satfinder
 
+import android.app.ActionBar
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -9,7 +10,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.android.synthetic.main.fragment_satellite_list.*
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
+import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.view.View
+import com.jbuckon.satfinder.R.styleable.PopupWindow
 import com.jbuckon.satfinder.ar.SatFinderAndroidActivity
 import com.jbuckon.satfinder.fragments.SatelliteFragment
 import com.jbuckon.satfinder.fragments.HomeFragment
@@ -51,7 +56,13 @@ import kotlinx.android.synthetic.main.fragment_enablesatellite_list.*
     for changes to the options page to take effect, the app has to be restarted.
 
  */
-class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFragmentInteractionListener, SatelliteFragment.OnListFragmentInteractionListener, HomeFragment.OnFragmentInteractionListener{
+class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFragmentInteractionListener,
+    SatelliteFragment.OnListFragmentInteractionListener, HomeFragment.OnFragmentInteractionListener, OptionsFragment.OpenFragmentListener{
+    override fun openFragment() {
+        intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
+    }
+
     override fun onFragmentInteraction(uri: Uri) {
         TODO("not implemented")
     }
@@ -70,6 +81,8 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
 
     }
 
+    private lateinit var satelliteFrag : SatelliteFragment
+    private lateinit var optionsFragment: OptionsFragment
     lateinit var satDataStore: SatDataStore
     private lateinit var pagerAdapter: PagerAdapter
     private var locationManager : LocationManager? = null
@@ -108,12 +121,13 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
 
 
         val satTrackFrag = TrackSatelliteFragment.newInstance(satDataStore)
-        val satelliteFrag = SatelliteFragment.newInstance(satDataStore)
-        val settings = OptionsFragment.newInstance(satDataStore)
+        satelliteFrag = SatelliteFragment.newInstance(satDataStore)
+        optionsFragment = OptionsFragment.newInstance(satDataStore, this)
 
         val run = Runnable {
             satTrackFrag.trackList.adapter?.notifyDataSetChanged()
-            satelliteFrag.satList.adapter?.notifyDataSetChanged()
+            if(satelliteFrag.isVisible)
+                satelliteFrag.satList.adapter?.notifyDataSetChanged()
         }
         satDataStore.initFirebase(this, this, homeFragment, run)
         satDataStore.UpdateLoop()
@@ -122,7 +136,7 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
         /*settings.setOnClickListener(View.OnClickListener{
             viewPager.setCurrentItem(3, false)
         })*/
-        pagerAdapter = PagerAdapter(supportFragmentManager, arrayListOf(homeFragment, satTrackFrag, settings, satelliteFrag))
+        pagerAdapter = PagerAdapter(supportFragmentManager, arrayListOf(homeFragment, satTrackFrag, optionsFragment))
 
         /*var listener =  object : ViewPager.OnPageChangeListener {
 
@@ -183,7 +197,7 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
         }
         viewPager?.addOnPageChangeListener(listener)
         viewPager.post{ listener.onPageSelected(viewPager.currentItem) }*/
-        viewPager.offscreenPageLimit = 4
+        viewPager.offscreenPageLimit = 3
         viewPager.adapter = pagerAdapter
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
 
