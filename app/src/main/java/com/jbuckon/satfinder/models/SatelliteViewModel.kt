@@ -62,24 +62,31 @@ class SatelliteViewModel : ViewModel() {
         satelliteMap[sat.name] = null
     }
 
+    fun setPos(sat: Satellite) {
+        satelliteMap[sat.name]?.sat_position = sat.sat_position
+        liveSats.postValue(enabledSatellites.toTypedArray())
+
+    }
+
     fun set(sat: Satellite) {
 
         satelliteMap[sat.name] = sat
-        if(!satellites.any { s -> s.name == sat.name}) // if satellite does not already exists, add it to list
+        if(!satellites.any { s -> s.name == sat.name}) { // if satellite does not already exists, add it to list
             satellites.add(sat)
+        }
 
 
-        if(!sat.is_enabled && enabledSatellites.contains(sat)) { //if satellite is disabled, but in enabled array, remove it
-            enabledSatellites.remove(sat)
-            sat.marker?.remove()
-            sat.sat_position = null
-            sat.marker = null
+        val existingSat = enabledSatellites.firstOrNull{ x -> x.name == sat.name}
+        if(!sat.is_enabled &&  existingSat != null) { //if satellite is disabled, but in enabled array, remove it
+            enabledSatellites.remove(existingSat)
+            existingSat.marker?.remove()
+            existingSat.sat_position = null
+            existingSat.marker = null
 
         } else if(sat.is_enabled && !enabledSatellites.contains(sat)){ //if satellite is set to be enabled but not in enabled array, add it2
             enabledSatellites.add(sat)
         }
-
-        liveSats.postValue(enabledSatellites.toTypedArray())
+        liveSats.value = enabledSatellites.toTypedArray()
     }
 
     //firebase flag tells the function to not override existing marker and sat_position, since that is not stored in Firebase
@@ -91,6 +98,8 @@ class SatelliteViewModel : ViewModel() {
                     sat.sat_position = satelliteMap[sat.name]?.sat_position
                 }
             }
+            if(sat.name=="AAUCUBE2")
+                print(sat)
             set(sat)
         }
         liveSats.value = enabledSatellites.toTypedArray()

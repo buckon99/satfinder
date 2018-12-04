@@ -25,6 +25,10 @@ class SatDataStore {
 
     private var loop: Boolean = true
 
+    constructor() {
+        satViewModel = SatelliteViewModel()
+        satSourceViewModel = SatelliteSourceViewModel()
+    }
     fun ClearMarkers() {
         for(sat in satViewModel.enabledSatellites.toTypedArray()) {
             sat.marker = null
@@ -32,9 +36,8 @@ class SatDataStore {
     }
 
 
-    fun initFirebase(context: Context, lifeCycleOwner: LifecycleOwner, mapFragment: SupportMapFragment, callback: Runnable) {
-        satViewModel = SatelliteViewModel()
-        satSourceViewModel = SatelliteSourceViewModel()
+    fun initFirebase(context: Context?, lifeCycleOwner: LifecycleOwner?, mapFragment: SupportMapFragment?, callback: Runnable?) {
+
         val database = FirebaseDatabase.getInstance()
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -42,29 +45,32 @@ class SatDataStore {
             database.setPersistenceEnabled(true)
             prefs.edit().putBoolean("firstRun", false).apply()
         }
-        satViewModel.liveSats.observe(lifeCycleOwner, Observer<Array<Satellite>>{ sats ->
-            print(sats)
-            mapFragment.getMapAsync{
-                for(sat in sats!!){
-                    if(sat.is_enabled && sat.sat_position != null) {
-                        var pos = LatLng(sat.sat_position!!.lat, sat.sat_position!!.lon)
-                        if(sat.marker != null) {
-                            sat.marker?.position = pos
-                        } else {
-                            //create new marker for satellite
-                            sat.marker = it.addMarker(MarkerOptions().position(pos).title(sat.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.sat)))
+        if(lifeCycleOwner != null) {
+            satViewModel.liveSats.observe(lifeCycleOwner, Observer<Array<Satellite>>{ sats ->
+                print(sats)
+                mapFragment?.getMapAsync{
+                    for(sat in sats!!){
+                        if(sat.is_enabled && sat.sat_position != null) {
+                            var pos = LatLng(sat.sat_position!!.lat, sat.sat_position!!.lon)
+                            if(sat.marker != null) {
+                                sat.marker?.position = pos
+                            } else {
+                                //create new marker for satellite
+                                sat.marker = it.addMarker(MarkerOptions().position(pos).title(sat.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.sat)))
+                            }
                         }
                     }
+                    val count: Int = sats?.count()!!
+                    val sources : Int = satSourceViewModel.sources.count()
+                    if(/*sources > 0 && */count > 0)
+                    {
+                        //count?.text = "tracking " + sats + " satellites from " + sources + " sources"
+                        callback?.run()
+                    }
                 }
-                val count: Int = sats?.count()!!
-                val sources : Int = satSourceViewModel.sources.count()
-                if(/*sources > 0 && */count > 0)
-                {
-                    //count?.text = "tracking " + sats + " satellites from " + sources + " sources"
-                    callback.run()
-                }
-            }
-        })
+            })
+        }
+
 
 
         satSrcRef = database.getReference("satSources")
@@ -131,7 +137,7 @@ class SatDataStore {
 
                     if(sat != null) {
                         sat.sat_position = SatelliteDataFactory().CalcTle(sat.TLE)
-                        satViewModel.set(sat)
+                        satViewModel.setPos(sat)
                     }
                 }
                 Thread.sleep(500)//make sure to not update to fast as to not drain battery
