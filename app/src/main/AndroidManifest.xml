@@ -37,12 +37,6 @@
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/google_maps_key"/>
 
-        <service
-                android:name=".Factory.SatelliteDataService"
-                android:enabled="true"
-                android:exported="true">
-        </service>
-
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings"
@@ -50,6 +44,18 @@
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="com.jbuckon.satfinder.MainActivity"/>
+        </activity>
+        <activity
+                android:name=".DataSourceOptionsActivity"
+                android:label="@string/title_activity_datasourceoptions"
+                android:parentActivityName=".MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.jbuckon.satfinder.MainActivity"/>
+        </activity>
+        <activity
+                android:name=".TestSettingsActivity"
+                android:label="@string/title_activity_test_settings">
         </activity>
     </application>
 

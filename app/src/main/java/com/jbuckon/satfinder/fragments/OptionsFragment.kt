@@ -22,6 +22,8 @@ class OptionsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnP
 
     interface OpenFragmentListener {
         fun openFragment()
+        fun openDataSourceFragment()
+        fun openFeedbackFragment()
     }
 
     override fun onPreferenceStartScreen(preferenceFragmentCompat: PreferenceFragmentCompat?, p1: android.support.v7.preference.PreferenceScreen?): Boolean {
@@ -43,8 +45,6 @@ class OptionsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnP
 
     private lateinit var dataStore: SatDataStore
 
-    //needed due to bug in PreferenceFragmentCompat:
-    //https://stackoverflow.com/questions/34701740/preference-sub-screen-not-opening-when-using-support-v7-preference/34944339
     override fun getCallbackFragment(): Fragment {
         return this
     }
@@ -57,20 +57,16 @@ class OptionsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnP
             openFragmentListener?.openFragment()
             true
         }
-
-        /*val satellites = findPreference("satellites")
-        satellites.setOnPreferenceClickListener {
-
+        val dataSources = this.findPreference("sources")
+        dataSources.setOnPreferenceClickListener{
+            openFragmentListener?.openDataSourceFragment()
+            true
         }
-
-        val sources = findPreference("sources")
-        sources.setOnPreferenceClickListener {  }*/
-        // val entries = dataStore.satViewMode
-        // l.enabledSatellites.map{x -> x.name}
-        /*var listPreference: ListPreference = findPreference("satellites") as ListPreference
-        listPreference.entries = entries.toTypedArray()
-        listPreference.entryValues = entries.toTypedArray()
-        listPreference.setDefaultValue(entries[0])*/
+        val feedback = this.findPreference("feedback")
+        feedback.setOnPreferenceClickListener{
+            openFragmentListener?.openFeedbackFragment()
+            true
+        }
     }
 
 }

@@ -1,28 +1,30 @@
 package com.jbuckon.satfinder
 
 import android.annotation.TargetApi
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.preference.CheckBoxPreference
-import android.preference.ListPreference
-import android.preference.Preference
-import android.preference.PreferenceManager
+import android.preference.*
 import android.support.v14.preference.PreferenceFragment
 import android.support.v4.app.NavUtils
 import android.text.TextUtils
 import android.view.MenuItem
-import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.jbuckon.satfinder.R.id.source
 import com.jbuckon.satfinder.models.Satellite
-import android.widget.Toast
-
+import com.jbuckon.satfinder.models.SatSource
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 /**
@@ -35,44 +37,113 @@ import android.widget.Toast
  * for design guidelines and the [Settings API Guide](http://developer.android.com/guide/topics/ui/settings.html)
  * for more information on developing a Settings UI.
  */
-class SettingsActivity : AppCompatPreferenceActivity() {
+class DataSourceOptionsActivity : AppCompatPreferenceActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupActionBar()
         val database = FirebaseDatabase.getInstance()
-        val satRef = database.getReference("satellites")
-        val satellites = arrayListOf<Satellite>()
+        val sourceRef = database.getReference("satSources")
+        val satellites = database.getReference("satellites")
+        val existingSources = arrayListOf<SatSource>()
 
         val context = this
         val screen = preferenceManager.createPreferenceScreen(context)
         preferenceScreen = screen
-        satRef.addValueEventListener(object:  ValueEventListener{
+
+        var index = 0
+        sourceRef.addValueEventListener(object:  ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.run {
-                    val sats = children.mapNotNull { it.getValue(Satellite::class.java) }
+                    val screen = preferenceManager.createPreferenceScreen(context)
+                    preferenceScreen = screen
+                    val sources = children.mapNotNull { it.getValue(SatSource::class.java) }
 
-                    for(sat in sats)
-                    {
-                        val existingSat = satellites.firstOrNull { x -> x.name == sat.name }
+                    var cat = PreferenceCategory(context)
+                    cat.title = "Options"
+                    screen.addPreference(cat)
+                    var button : Preference? = null
+                    button = Preference(context)
+                    button.key = "update"
+                    button.title = "Update Satellites From Sources"
+                    cat.addPreference(button)
 
-                        var checkBox : CheckBoxPreference? = null
-                        if(existingSat == null){
-                            satellites.add(sat)
-                            checkBox = CheckBoxPreference(context)
-                            checkBox.key = sat.name
-                            checkBox.title = sat.name
-                            checkBox.isChecked = sat.is_enabled
-                            screen.addPreference(checkBox)
-                        }else {
-                            checkBox = screen.findPreference(sat.name) as CheckBoxPreference
-                            checkBox.isChecked = existingSat.is_enabled
+                    val edit = Preference(context)
+                    edit.key = "add"
+                    edit.title = "Add TLE Source"
+
+                    edit.setOnPreferenceClickListener {
+
+                        val builder = AlertDialog.Builder(context)
+
+                        val positiveClick = DialogInterface.OnClickListener { dialog, id ->
+                            val name = ((dialog as AlertDialog).findViewById(R.id.name) as EditText).text
+                            val url = ((dialog as AlertDialog).findViewById(R.id.source) as EditText).text
+                            val src = SatSource(index.toString(), name.toString(), url.toString())
+                            try{
+                                Thread{
+                                    try{
+                                        val path = URL( url.toString())
+                                        var c = path.openConnection() as HttpURLConnection
+                                        var data = c.inputStream.bufferedReader().readText()
+                                        val lines = data.split("\n")
+                                        for(i in 0 until lines.count()/3) {
+                                            var tle = lines[i*3] + "\n" + lines[i*3 + 1] + "\n" + lines[i*3 + 2]
+                                            val sat = Satellite(lines[i*3], tle, false)
+                                            satellites.child(sat.name).setValue(sat)
+                                        }
+
+                                        sourceRef.child(src.id).setValue(src)
+                                        runOnUiThread{
+                                            Toast.makeText(context, "Data Source Added Successfully", Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        //todo add satellites to firebase
+                                    }catch (e: Exception){
+                                        runOnUiThread{
+                                            Toast.makeText(context, "Error adding Data Source", Toast.LENGTH_SHORT).show()
+                                        }
+
+
+                                        //Toast error
+                                    }
+
+                                }.start()
+                            }catch (e: Exception) {
+                                Toast.makeText(context, "Error adding Data Source", Toast.LENGTH_SHORT).show()
+
+                            }
                         }
-                        checkBox.setOnPreferenceClickListener {
-                            val _sat = satellites.first{ x -> x.name == checkBox.key }
-                            _sat.is_enabled = (it as CheckBoxPreference).isChecked
-                            satRef.child(_sat.name).setValue(_sat)
-                            true
+                        // Inflate and set the layout for the dialog
+                        // Pass null as the parent view because its going in the dialog layout
+                        builder.setView(layoutInflater.inflate(R.layout.dialog_add_source, null))
+                            // Add action buttons
+                            .setPositiveButton("Submit", positiveClick)
+                            .setNegativeButton("Cancel", { dialog, id ->
+                                    dialog.cancel()
+                                })
+                        builder.create()
+                        var dialog = builder.show()
+                        true
+                    }
+                    cat.addPreference(edit)
+
+                    cat = PreferenceCategory(context)
+                    cat.title = "Sources"
+                    screen.addPreference(cat)
+                    for(source in sources)
+                    {
+                        val existingSource = existingSources.firstOrNull { x -> x.name == source.name }
+
+                        if(index <= source.id.toInt()) {
+                            index = source.id.toInt() + 1
+                        }
+                        var checkBox : Preference? = null
+                        if(existingSource == null){
+                            checkBox = Preference(context)
+                            checkBox.key = source.name
+                            checkBox.title = source.name
+                            cat.addPreference(checkBox)
                         }
                     }
                 }
@@ -146,7 +217,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
             val id = item.itemId
             if (id == android.R.id.home) {
-                startActivity(Intent(activity, SettingsActivity::class.java))
+                startActivity(Intent(activity, DataSourceOptionsActivity::class.java))
                 return true
             }
             return super.onOptionsItemSelected(item)

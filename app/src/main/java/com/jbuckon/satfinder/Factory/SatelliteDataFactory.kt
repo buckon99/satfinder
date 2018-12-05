@@ -1,6 +1,7 @@
 package com.jbuckon.satfinder.Factory
 
 import com.jbuckon.satfinder.models.SatPos
+import com.jbuckon.satfinder.models.SatSource
 import com.jbuckon.satfinder.predict.GroundStationPosition
 import com.jbuckon.satfinder.predict.PassPredictor
 import com.jbuckon.satfinder.predict.TLE
@@ -31,4 +32,5 @@ class SatelliteDataFactory {
         }
         return null
     }
+
 }

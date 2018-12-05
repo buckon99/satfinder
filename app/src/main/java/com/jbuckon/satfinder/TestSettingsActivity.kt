@@ -4,26 +4,18 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.preference.CheckBoxPreference
 import android.preference.ListPreference
 import android.preference.Preference
+import android.preference.PreferenceActivity
+import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
-import android.support.v14.preference.PreferenceFragment
-import android.support.v4.app.NavUtils
+import android.preference.RingtonePreference
 import android.text.TextUtils
 import android.view.MenuItem
-import android.widget.CheckBox
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.jbuckon.satfinder.models.Satellite
-import android.widget.Toast
-
-
 
 /**
  * A [PreferenceActivity] that presents a set of application settings. On
@@ -35,62 +27,11 @@ import android.widget.Toast
  * for design guidelines and the [Settings API Guide](http://developer.android.com/guide/topics/ui/settings.html)
  * for more information on developing a Settings UI.
  */
-class SettingsActivity : AppCompatPreferenceActivity() {
+class TestSettingsActivity : AppCompatPreferenceActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupActionBar()
-        val database = FirebaseDatabase.getInstance()
-        val satRef = database.getReference("satellites")
-        val satellites = arrayListOf<Satellite>()
-
-        val context = this
-        val screen = preferenceManager.createPreferenceScreen(context)
-        preferenceScreen = screen
-        satRef.addValueEventListener(object:  ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.run {
-                    val sats = children.mapNotNull { it.getValue(Satellite::class.java) }
-
-                    for(sat in sats)
-                    {
-                        val existingSat = satellites.firstOrNull { x -> x.name == sat.name }
-
-                        var checkBox : CheckBoxPreference? = null
-                        if(existingSat == null){
-                            satellites.add(sat)
-                            checkBox = CheckBoxPreference(context)
-                            checkBox.key = sat.name
-                            checkBox.title = sat.name
-                            checkBox.isChecked = sat.is_enabled
-                            screen.addPreference(checkBox)
-                        }else {
-                            checkBox = screen.findPreference(sat.name) as CheckBoxPreference
-                            checkBox.isChecked = existingSat.is_enabled
-                        }
-                        checkBox.setOnPreferenceClickListener {
-                            val _sat = satellites.first{ x -> x.name == checkBox.key }
-                            _sat.is_enabled = (it as CheckBoxPreference).isChecked
-                            satRef.child(_sat.name).setValue(_sat)
-                            true
-                        }
-                    }
-                }
-            }
-            override fun onCancelled(p0: DatabaseError) {
-                print("error")
-            }
-        })
-
-
-        //
-        //r.addPreference(Preference())
-        // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-        // to their values. When their values change, their summaries are
-        // updated to reflect the new value, per the Android Design
-        // guidelines.
-        //bindPreferenceSummaryToValue(findPreference("example_text"))
-        //bindPreferenceSummaryToValue(findPreference("example_list"))
     }
 
     /**
@@ -100,17 +41,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onMenuItemSelected(featureId: Int, item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            if (!super.onMenuItemSelected(featureId, item)) {
-                NavUtils.navigateUpFromSameTask(this)
-            }
-            return true
-        }
-        return super.onMenuItemSelected(featureId, item)
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -118,6 +48,13 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         return isXLargeTablet(this)
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    override fun onBuildHeaders(target: List<PreferenceActivity.Header>) {
+        loadHeadersFromResource(R.xml.pref_headers, target)
+    }
 
     /**
      * This method stops fragment injection in malicious applications.
@@ -126,6 +63,8 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     override fun isValidFragment(fragmentName: String): Boolean {
         return PreferenceFragment::class.java.name == fragmentName
                 || GeneralPreferenceFragment::class.java.name == fragmentName
+                || DataSyncPreferenceFragment::class.java.name == fragmentName
+                || NotificationPreferenceFragment::class.java.name == fragmentName
     }
 
     /**
@@ -134,19 +73,79 @@ class SettingsActivity : AppCompatPreferenceActivity() {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     class GeneralPreferenceFragment : PreferenceFragment() {
-        override fun onCreatePreferences(p0: Bundle?, p1: String?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
+            addPreferencesFromResource(R.xml.pref_general)
+            setHasOptionsMenu(true)
 
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(findPreference("example_text"))
+            bindPreferenceSummaryToValue(findPreference("example_list"))
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
             val id = item.itemId
             if (id == android.R.id.home) {
-                startActivity(Intent(activity, SettingsActivity::class.java))
+                startActivity(Intent(activity, TestSettingsActivity::class.java))
+                return true
+            }
+            return super.onOptionsItemSelected(item)
+        }
+    }
+
+    /**
+     * This fragment shows notification preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    class NotificationPreferenceFragment : PreferenceFragment() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            addPreferencesFromResource(R.xml.pref_notification)
+            setHasOptionsMenu(true)
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"))
+        }
+
+        override fun onOptionsItemSelected(item: MenuItem): Boolean {
+            val id = item.itemId
+            if (id == android.R.id.home) {
+                startActivity(Intent(activity, TestSettingsActivity::class.java))
+                return true
+            }
+            return super.onOptionsItemSelected(item)
+        }
+    }
+
+    /**
+     * This fragment shows data and sync preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    class DataSyncPreferenceFragment : PreferenceFragment() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            addPreferencesFromResource(R.xml.pref_data_sync)
+            setHasOptionsMenu(true)
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(findPreference("sync_frequency"))
+        }
+
+        override fun onOptionsItemSelected(item: MenuItem): Boolean {
+            val id = item.itemId
+            if (id == android.R.id.home) {
+                startActivity(Intent(activity, TestSettingsActivity::class.java))
                 return true
             }
             return super.onOptionsItemSelected(item)
@@ -176,6 +175,33 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                         null
                 )
 
+            } else if (preference is RingtonePreference) {
+                // For ringtone preferences, look up the correct display value
+                // using RingtoneManager.
+                if (TextUtils.isEmpty(stringValue)) {
+                    // Empty values correspond to 'silent' (no ringtone).
+                    preference.setSummary(R.string.pref_ringtone_silent)
+
+                } else {
+                    val ringtone = RingtoneManager.getRingtone(
+                        preference.getContext(), Uri.parse(stringValue)
+                    )
+
+                    if (ringtone == null) {
+                        // Clear the summary if there was a lookup error.
+                        preference.setSummary(null)
+                    } else {
+                        // Set the summary to reflect the new ringtone display
+                        // name.
+                        val name = ringtone.getTitle(preference.getContext())
+                        preference.setSummary(name)
+                    }
+                }
+
+            } else {
+                // For all other preferences, set the summary to the value's
+                // simple string representation.
+                preference.summary = stringValue
             }
             true
         }

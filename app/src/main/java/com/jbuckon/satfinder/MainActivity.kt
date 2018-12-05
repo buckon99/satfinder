@@ -63,6 +63,15 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
         startActivity(intent)
     }
 
+    override fun openDataSourceFragment() {
+        intent = Intent(this, DataSourceOptionsActivity::class.java)
+        startActivity(intent)
+    }
+
+    override fun openFeedbackFragment() {
+        intent = Intent(this, TestSettingsActivity::class.java)
+        startActivity(intent)
+    }
     override fun onFragmentInteraction(uri: Uri) {
         TODO("not implemented")
     }

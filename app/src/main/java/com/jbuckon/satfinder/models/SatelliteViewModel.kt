@@ -98,8 +98,6 @@ class SatelliteViewModel : ViewModel() {
                     sat.sat_position = satelliteMap[sat.name]?.sat_position
                 }
             }
-            if(sat.name=="AAUCUBE2")
-                print(sat)
             set(sat)
         }
         liveSats.value = enabledSatellites.toTypedArray()
