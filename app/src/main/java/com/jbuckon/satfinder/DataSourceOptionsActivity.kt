@@ -66,6 +66,43 @@ class DataSourceOptionsActivity : AppCompatPreferenceActivity() {
                     button = Preference(context)
                     button.key = "update"
                     button.title = "Update Satellites From Sources"
+                    button.setOnPreferenceClickListener {
+                        Toast.makeText(context, "Pulling Data...", Toast.LENGTH_SHORT).show()
+                        try{
+                            Thread{
+                                try{
+                                    for(source in sources) {
+                                        val path = URL( source.tle_url)
+                                        val c = path.openConnection() as HttpURLConnection
+                                        val data = c.inputStream.bufferedReader().readText()
+                                        val lines = data.split("\n")
+                                        for(i in 0 until lines.count()/3) {
+                                            val tle = lines[i*3] + "\n" + lines[i*3 + 1] + "\n" + lines[i*3 + 2]
+                                            val sat = Satellite(lines[i*3].replace("$", "").replace(".", ""), tle, false)
+                                            val result = HashMap<String, Any>()
+                                            result["tle"] = tle
+                                            satellites.child(sat.name).updateChildren(result)
+                                        }
+                                    }
+
+                                    runOnUiThread{
+                                        Toast.makeText(context, "Update Successful", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    //todo add satellites to firebase
+                                }catch (e: Exception){
+                                    runOnUiThread{
+                                        Toast.makeText(context, "Error Getting Updates", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+
+                            }.start()
+                        }catch (e: Exception) {
+                            Toast.makeText(context, "Error in update thread", Toast.LENGTH_SHORT).show()
+                        }
+
+                        true
+                    }
                     cat.addPreference(button)
 
                     val edit = Preference(context)
