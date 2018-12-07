@@ -10,7 +10,6 @@ import android.widget.Toast
 import com.google.firebase.database.FirebaseDatabase
 import com.jbuckon.satfinder.R
 import com.jbuckon.satfinder.SatDataStore
-import com.google.firebase.database.DatabaseReference
 
 
 
@@ -65,11 +64,11 @@ class OptionsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnP
         val feedback = this.findPreference("feedback")
         feedback.setOnPreferenceClickListener{
             val positiveClick = DialogInterface.OnClickListener { dialog, id ->
-                val feedback = ((dialog as AlertDialog).findViewById(R.id.feedback) as EditText).text
+                val feedBackText = ((dialog as AlertDialog).findViewById(R.id.feedback) as EditText).text
                 val database = FirebaseDatabase.getInstance()
                 val sourceRef = database.getReference("feedback")
                 val newPostRef = sourceRef.push()
-                newPostRef.setValue(feedback.toString())
+                newPostRef.setValue(feedBackText.toString())
 
                 Toast.makeText(context, "Feedback submitted", Toast.LENGTH_SHORT).show()
             }
