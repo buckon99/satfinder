@@ -1,10 +1,18 @@
 package com.jbuckon.satfinder.fragments
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.preference.PreferenceFragmentCompat
+import android.widget.EditText
+import android.widget.Toast
+import com.google.firebase.database.FirebaseDatabase
 import com.jbuckon.satfinder.R
 import com.jbuckon.satfinder.SatDataStore
+import com.google.firebase.database.DatabaseReference
+
+
 
 
 
@@ -56,7 +64,27 @@ class OptionsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnP
         }
         val feedback = this.findPreference("feedback")
         feedback.setOnPreferenceClickListener{
-            openFragmentListener?.openFeedbackFragment()
+            val positiveClick = DialogInterface.OnClickListener { dialog, id ->
+                val feedback = ((dialog as AlertDialog).findViewById(R.id.feedback) as EditText).text
+                val database = FirebaseDatabase.getInstance()
+                val sourceRef = database.getReference("feedback")
+                val newPostRef = sourceRef.push()
+                newPostRef.setValue(feedback.toString())
+
+                Toast.makeText(context, "Feedback submitted", Toast.LENGTH_SHORT).show()
+            }
+            val builder = AlertDialog.Builder(context)
+
+            // Inflate and set the layout for the dialog
+            // Pass null as the parent view because its going in the dialog layout
+            builder.setView(layoutInflater.inflate(R.layout.dialog_feedback, null))
+                // Add action buttons
+                .setPositiveButton("Submit", positiveClick)
+                .setNegativeButton("Cancel", { dialog, id ->
+                    dialog.cancel()
+                })
+            builder.create()
+            var dialog = builder.show()
             true
         }
     }

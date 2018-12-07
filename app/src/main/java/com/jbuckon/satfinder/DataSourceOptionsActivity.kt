@@ -112,7 +112,6 @@ class DataSourceOptionsActivity : AppCompatPreferenceActivity() {
 
                     edit.setOnPreferenceClickListener {
 
-                        val builder = AlertDialog.Builder(context)
 
                         val positiveClick = DialogInterface.OnClickListener { dialog, id ->
                             val name = ((dialog as AlertDialog).findViewById(R.id.name) as EditText).text
@@ -152,6 +151,8 @@ class DataSourceOptionsActivity : AppCompatPreferenceActivity() {
 
                             }
                         }
+                        val builder = AlertDialog.Builder(context)
+
                         // Inflate and set the layout for the dialog
                         // Pass null as the parent view because its going in the dialog layout
                         builder.setView(layoutInflater.inflate(R.layout.dialog_add_source, null))

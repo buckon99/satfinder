@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-
-    <TextView
-        android:id="@+id/item_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+<android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:layout_marginTop="10dp"
-        android:text="Sample Name"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:paddingBottom="20dp"
+        card_view:cardCornerRadius="4dp">
 
-    <TextView
-            android:id="@+id/label"
+    <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/item_number"
-            android:layout_alignLeft="@id/item_number"
-            android:text="next pass:"
-            android:textAppearance="?attr/textAppearanceListItem" />
-    <TextView
-        android:id="@+id/content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/label"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
+            android:orientation="horizontal"
+            android:paddingBottom="10dp">
 
-</RelativeLayout>
+        <TextView
+                android:id="@+id/item_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Sample Name"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+        <TextView
+                android:id="@+id/label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/item_number"
+                android:layout_alignLeft="@id/item_number"
+                android:text="next pass:"
+                android:textAppearance="?attr/textAppearanceListItem" />
+        <TextView
+                android:id="@+id/content"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/label"
+                android:layout_alignBottom="@id/label"
+                android:paddingLeft="15dp"
+                android:textAppearance="?attr/textAppearanceListItem" android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
+
