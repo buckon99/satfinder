@@ -7,6 +7,7 @@
             android:key="satellites"
             android:persistent="false"
             android:summary="Select Satellites you want to Track"
+            android:icon="@drawable/ic_pin"
             android:title="Tracked Satellites" >
     </Preference>
 
@@ -14,7 +15,9 @@
             android:key="sources"
             android:persistent="false"
             android:summary="Manage Data Sources"
-            android:title="Data Sources">
+            android:title="Data Sources"
+            android:icon="@drawable/ic_server"
+    >
 
     </PreferenceScreen>
 
@@ -22,6 +25,7 @@
     <Preference
             app:key="feedback"
             app:title="Send feedback"
-            app:summary="Report technical issues or suggest new features" />
+            app:summary="Report technical issues or suggest new features"
+            android:icon="@drawable/ic_message" />
 
 </PreferenceScreen>

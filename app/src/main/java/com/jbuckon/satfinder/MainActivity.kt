@@ -1,6 +1,5 @@
 package com.jbuckon.satfinder
 
-import android.app.ActionBar
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -10,11 +9,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.android.synthetic.main.fragment_satellite_list.*
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
-import android.support.v4.app.Fragment
-import android.view.Gravity
-import android.view.View
-import com.jbuckon.satfinder.R.styleable.PopupWindow
 import com.jbuckon.satfinder.ar.SatFinderAndroidActivity
 import com.jbuckon.satfinder.fragments.SatelliteFragment
 import com.jbuckon.satfinder.fragments.HomeFragment
@@ -69,8 +63,7 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
     }
 
     override fun openFeedbackFragment() {
-        intent = Intent(this, TestSettingsActivity::class.java)
-        startActivity(intent)
+
     }
     override fun onFragmentInteraction(uri: Uri) {
         TODO("not implemented")

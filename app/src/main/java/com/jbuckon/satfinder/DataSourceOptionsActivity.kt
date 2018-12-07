@@ -80,6 +80,7 @@ class DataSourceOptionsActivity : AppCompatPreferenceActivity() {
                                             val tle = lines[i*3] + "\n" + lines[i*3 + 1] + "\n" + lines[i*3 + 2]
                                             val sat = Satellite(lines[i*3].replace("$", "").replace(".", ""), tle, false)
                                             val result = HashMap<String, Any>()
+                                            result["name"] = sat.name
                                             result["tle"] = tle
                                             satellites.child(sat.name).updateChildren(result)
                                         }
@@ -180,6 +181,10 @@ class DataSourceOptionsActivity : AppCompatPreferenceActivity() {
                             checkBox = Preference(context)
                             checkBox.key = source.name
                             checkBox.title = source.name
+                            checkBox.setOnPreferenceClickListener {
+                                Toast.makeText(context, source.tle_url, Toast.LENGTH_SHORT).show()
+                                true
+                            }
                             cat.addPreference(checkBox)
                         }
                     }

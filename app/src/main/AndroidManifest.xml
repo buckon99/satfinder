@@ -25,7 +25,8 @@
         </activity>
         <activity
                 android:name=".ar.SatFinderAndroidActivity"
-                android:label="@string/ar_activity">
+                android:label="@string/ar_activity"
+                android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -52,10 +53,6 @@
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="com.jbuckon.satfinder.MainActivity"/>
-        </activity>
-        <activity
-                android:name=".TestSettingsActivity"
-                android:label="@string/title_activity_test_settings">
         </activity>
     </application>
 

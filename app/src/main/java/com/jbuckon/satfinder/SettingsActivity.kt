@@ -63,13 +63,14 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                             checkBox.key = sat.name
                             checkBox.title = sat.name
                             checkBox.isChecked = sat.is_enabled
+
                             screen.addPreference(checkBox)
                         }else {
                             checkBox = screen.findPreference(sat.name) as CheckBoxPreference
                             checkBox.isChecked = existingSat.is_enabled
                         }
                         checkBox.setOnPreferenceClickListener {
-                            val _sat = satellites.first{ x -> x.name == checkBox.key }
+                            val _sat = satellites.first{ x -> x.name == it.key }
                             _sat.is_enabled = (it as CheckBoxPreference).isChecked
                             satRef.child(_sat.name).setValue(_sat)
                             true
