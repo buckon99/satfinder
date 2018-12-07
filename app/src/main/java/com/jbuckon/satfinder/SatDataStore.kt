@@ -3,11 +3,10 @@ package com.jbuckon.satfinder
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
 import android.content.Context
+import android.graphics.Color
 import android.preference.PreferenceManager
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.database.*
 import com.jbuckon.satfinder.Factory.SatelliteDataFactory
 import com.jbuckon.satfinder.models.SatelliteViewModel
@@ -45,10 +44,27 @@ class SatDataStore {
             database.setPersistenceEnabled(true)
             prefs.edit().putBoolean("firstRun", false).apply()
         }
+        var polyline: Polyline? = null
         if(lifeCycleOwner != null) {
             satViewModel.liveSats.observe(lifeCycleOwner, Observer<Array<Satellite>>{ sats ->
-                print(sats)
                 mapFragment?.getMapAsync{
+                    val map = it
+                    it.setOnMarkerClickListener {
+                        polyline?.remove()
+                        if(satViewModel.satelliteMap[it.title]?.TLE != null){
+                            var markers = SatelliteDataFactory().CalcFuturePos(satViewModel.satelliteMap[it.title]?.TLE!!)
+                            val options = PolylineOptions()
+                            for(marker in markers) {
+                                options.add(LatLng(marker.lat, marker.lon))
+                            }
+                            options.width(5.0f)
+                            options.color(Color.GREEN)
+                            polyline = map.addPolyline(options)
+                        }
+
+                        it.showInfoWindow()
+                        true
+                    }
                     for(sat in sats!!){
                         if(sat.is_enabled && sat.sat_position != null) {
                             var pos = LatLng(sat.sat_position!!.lat, sat.sat_position!!.lon)
@@ -57,6 +73,7 @@ class SatDataStore {
                             } else {
                                 //create new marker for satellite
                                 sat.marker = it.addMarker(MarkerOptions().position(pos).title(sat.name).icon(BitmapDescriptorFactory.fromResource(R.drawable.sat)))
+
                             }
                         }
                     }

@@ -133,7 +133,7 @@ final public class SatImageOverlay extends android.support.v7.widget.AppCompatIm
 
         if(name != null)
         //drawSat(canvas, paint, azm * dToR, elev * dToR, "test", c);
-            drawSat(canvas, paint, azm * dToR, -20 * dToR,
+            drawSat(canvas, paint, azm * dToR, elev * dToR,
                 name, c);
         if (false) {
             // extra data for calibration
@@ -154,7 +154,7 @@ final public class SatImageOverlay extends android.support.v7.widget.AppCompatIm
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(col);
         float alt = scaler((float) -el, yAngle, yDim);
-        float xp = convertAzimuth(azm, activity.magDec);
+        float xp = convertAzimuth(az, activity.magDec);
         canvas.drawCircle(xp, alt, radius, paint);
         float len = paint.measureText(name) / 2;
         canvas.drawText(name, xp - len, alt - (radius + paint.descent()), paint);

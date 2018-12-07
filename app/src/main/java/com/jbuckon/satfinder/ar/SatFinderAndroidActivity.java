@@ -41,7 +41,9 @@ import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.jbuckon.satfinder.Factory.SatelliteDataFactory;
 import com.jbuckon.satfinder.R;
+import com.jbuckon.satfinder.models.SatPos;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -234,11 +236,28 @@ public class SatFinderAndroidActivity extends AppCompatActivity implements
     private void setupLinks() {
         skyViewTab = findViewById(R.id.skyview_tab);
         skyViewOverlay = findViewById(R.id.sat_overlay);
-
-        double azimuth = getIntent().getDoubleExtra("azimuth", 0);
-        double elevation = getIntent().getDoubleExtra("elevation", 0);
         String name = getIntent().getStringExtra("name");
-        skyViewOverlay.setSat(azimuth, elevation, name);
+
+
+        new Thread(new Runnable() {
+            public void run() {
+                // a potentially time consuming task
+                try{
+                    String name = getIntent().getStringExtra("name");
+                    String tle = getIntent().getStringExtra("TLE");
+                    SatelliteDataFactory factory = new SatelliteDataFactory();
+                    do {
+                        SatPos pos = factory.CalcTle(tle);
+                        double azimuth =pos.getAzimuth();
+                        double elevation = pos.getElevation();
+                        skyViewOverlay.setSat(azimuth, elevation, name);
+                        Thread.sleep(1000);
+                    }while(true);
+                }catch(Exception e) {
+
+                }
+            }
+        }).start();
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

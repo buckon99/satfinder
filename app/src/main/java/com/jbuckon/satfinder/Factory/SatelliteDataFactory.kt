@@ -33,4 +33,28 @@ class SatelliteDataFactory {
         return null
     }
 
+    fun CalcFuturePos(tle: String) : Array<SatPos> {
+        val satpos = arrayListOf<SatPos>()
+        var tles = tle.split("\n").toTypedArray()
+        val tleObj = TLE(tles)
+
+        var passPredict = PassPredictor(tleObj, GroundStationPosition(35.28, -120.66, 3.0))//TODO: don't hardcode this, get location from user
+
+        for(i in 0..10) {
+            val cal = Calendar.getInstance()
+            cal.time = Date()
+            cal.add(Calendar.MINUTE, 3*i)
+            val pos = passPredict.getSatPos(cal.time)
+            satpos.add(SatPos(
+                "",
+                "",
+                pos.calcLatitude,
+                pos.calcLongitude,
+                pos.calcAzimuth,
+                pos.calcElevation
+            ))
+        }
+        return satpos.toTypedArray()
+    }
+
 }

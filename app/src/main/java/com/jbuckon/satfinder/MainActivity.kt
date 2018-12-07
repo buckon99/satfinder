@@ -71,9 +71,8 @@ class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFrag
 
     override fun onTrackListFragmentInteraction(item: Satellite?) {
         intent = Intent(this, SatFinderAndroidActivity::class.java)
-        if(item?.sat_position != null) {
-            intent.putExtra("azimuth", item.sat_position!!.azimuth)
-            intent.putExtra("elevation", item.sat_position!!.elevation!!)
+        if(item != null) {
+            intent.putExtra("TLE", item.TLE)
             intent.putExtra("name", item.name)
         }
 
