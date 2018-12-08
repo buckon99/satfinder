@@ -18,36 +18,30 @@ import com.jbuckon.satfinder.models.Satellite
 import kotlinx.android.synthetic.main.fragment_enablesatellite_list.*
 
 /*
-    MILESTONE 3 PROJECT NOTES
+    MILESTONE 4 PROJECT NOTES
     =========================================================================
 
     Resources:
 
-    ar app that the code from the package com.jbuckon.satfinder.ar is based off of:
+    ar app that the code from the package com.jbuckon.satfinder.ar is based off of: https://arachnoid.com/android/SatFinderAndroid/index.html
+        - original library was for tracking geostationary satellites, repurposed to track moving satellites
     prediction library that com.jbuckon.satfinder.predict is a modified version of: https://github.com/g4dpz/predict4java
 
-    Milestone 3 Notes:
+    Milestone 4 Notes:
 
     - For AR Tracking of Satellites, I decided not to go with AR Core because after researching and testing the Library,
     I realized it was not the right use case. Instead, for the AR functionality I modified code from an open source app that
     projects images over the camera at a given azimuth and elevation using the gyroscope and compass of a device.
 
-    - in milestone 3 I mentioned my data would come from celestrak, instead I decided to make data sources configurable to
-    support other sources as well. the UI is not in the app, however, data sources are pulled from firebase. the only data
-    source currently loaded in is http://mstl.atl.calpoly.edu/~ops/keps/kepler.txt which is a filtered version of celestrak's
-    data
+    - parsing and calculating pass schedule is cpu intensive so there is a bit of a delay on launch before map & list view populates.
+      the delay is worse with the more objects being tracked. the recommended number is under 10
 
-    - parsing and calculating pass schedule is cpu intensive so there is a bit of a delay on launch before map populates
+    - app has SLO location hardcoded, will not work elsewhere
 
-    - currently the map and AR view do not refresh, but that is functionality that will be in the final app
+    Known Issue:
 
-    - app has SLO location hardcoded, will in future use location permissions to use users' location for AR tracking
-
-    - date/time picking is not yet implemented
-
-    Known Issues:
-    - there is a problem I have yet to find a solution for with the home page that causes it to not work after the options page is visited.
-    for changes to the options page to take effect, the app has to be restarted.
+    - In the emulator, sometimes the AR activity doesn't immediately load when clicking on the satellite in the list view.
+    After clicking on a card in the list view few times, the AR view should load. this problem only appears on emulators
 
  */
 class MainActivity : AppCompatActivity(), TrackSatelliteFragment.OnTrackListFragmentInteractionListener,
