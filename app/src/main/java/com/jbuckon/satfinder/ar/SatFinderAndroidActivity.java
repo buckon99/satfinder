@@ -104,6 +104,13 @@ public class SatFinderAndroidActivity extends AppCompatActivity implements
 
     protected DisplayMetrics metrics;
 
+    private boolean loop = true;
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        loop = false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -252,7 +259,7 @@ public class SatFinderAndroidActivity extends AppCompatActivity implements
                         double elevation = pos.getElevation();
                         skyViewOverlay.setSat(azimuth, elevation, name);
                         Thread.sleep(1000);
-                    }while(true);
+                    }while(loop);
                 }catch(Exception e) {
 
                 }

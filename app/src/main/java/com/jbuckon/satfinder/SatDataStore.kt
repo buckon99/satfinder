@@ -49,6 +49,9 @@ class SatDataStore {
             satViewModel.liveSats.observe(lifeCycleOwner, Observer<Array<Satellite>>{ sats ->
                 mapFragment?.getMapAsync{
                     val map = it
+                    it.setOnMapClickListener {
+                        polyline?.remove()
+                    }
                     it.setOnMarkerClickListener {
                         polyline?.remove()
                         if(satViewModel.satelliteMap[it.title]?.TLE != null){

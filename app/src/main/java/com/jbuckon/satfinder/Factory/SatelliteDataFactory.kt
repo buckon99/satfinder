@@ -40,10 +40,10 @@ class SatelliteDataFactory {
 
         var passPredict = PassPredictor(tleObj, GroundStationPosition(35.28, -120.66, 3.0))//TODO: don't hardcode this, get location from user
 
-        for(i in 0..10) {
+        for(i in 0..30) {
             val cal = Calendar.getInstance()
             cal.time = Date()
-            cal.add(Calendar.MINUTE, 3*i)
+            cal.add(Calendar.MINUTE, i)
             val pos = passPredict.getSatPos(cal.time)
             satpos.add(SatPos(
                 "",
